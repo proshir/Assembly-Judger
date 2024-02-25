@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Submission Detail{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Submission Detail</h2>
+    <p>User: {{ submission.user }}</p>
+    <p>Problem: <a href="{% url 'view_problem' submission.problem.id %}">{{ submission.problem.name }}</a></p>
+    <p>Score: {{ submission.score }}</p>
+    <p>Status: <span class="badge bg-{% if submission.status == 'Queued' %}warning{% elif submission.status == 'Testing' %}primary{% elif submission.status == 'Completed' %}success{% else %}danger{% endif %}">{{ submission.get_status_display }}</span></p>
+
+    <h3>Code File:</h3>
+
+    <textarea class="form-control code-textarea" rows="10" readonly>{{ code_content }}</textarea>
+
+    <h3>Result:</h3>
+    <ul class="list-group">
+        {% for test_case_num, result_meaning in submission.get_result_meanings %}
+            <li class="list-group-item">Test Case {{ test_case_num }}: {{ result_meaning }}</li>
+        {% empty %}
+            <li class="list-group-item">No result available</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<style>
+    .code-textarea {
+        background-color: #eeeeee; /* Gray background */
+        color: #343a40; /* Dark text color */
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        font-family: "Courier New", Courier, monospace;
+        padding: 10px;
+    }
+    .list-group {
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}

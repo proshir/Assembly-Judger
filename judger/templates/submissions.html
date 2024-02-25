@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+<link href="https://cdn.datatables.net/v/bs5/dt-2.0.0/datatables.min.css" rel="stylesheet">
+<script src="https://cdn.datatables.net/v/bs5/dt-2.0.0/datatables.min.js"></script>
+{% block content %}
+<div class="container">
+    <h2>Submissions</h2>
+
+    <div class="card">
+        <div class="card-body">
+        <a href="?download_csv=true" class="btn btn-primary mb-3">Download CSV</a>
+        <table id="submissionTable" class="table">
+        <thead>
+            <tr>
+                <th>Submission ID</th>
+                <th>Status</th>
+                <th>Score</th>
+                <th>User</th>
+                <th>Problem</th>
+                <th>Submitted</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for submission in submissions %}
+            <tr>
+                <td><a href="{% url 'submission_detail' submission.id %}">Submission {{ submission.id }}</a></td>
+                <td><span class="badge bg-{% if submission.status == 'Queued' %}warning{% elif submission.status == 'Testing' %}primary{% elif submission.status == 'Completed' %}success{% else %}danger{% endif %}">{{ submission.get_status_display }}</span></td>
+                <td>{{ submission.score }}</td>
+                <td><a href="{% url 'view_submissions' %}?user_id={{ submission.user.id }}">{{ submission.user }}</a></td>
+                <td><a href="{% url 'view_problem' submission.problem.id %}">{{ submission.problem.name }}</a></td>
+                <td>{{ submission.created_at }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    </div>
+</div>
+
+
+{% endblock %}

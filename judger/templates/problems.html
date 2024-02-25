@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Problem List{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">Problem List</div>
+            <div class="card-body">
+                <ul class="list-group">
+                    {% for problem in problems %}
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <a href="{% url 'view_problem' problem.id %}">{{ problem.name }}</a>
+                                </div>
+                                <div>
+                                    {% if problem.can_send %}
+                                        <span class="badge bg-success">Can Send</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Cannot Send</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

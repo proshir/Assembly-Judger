@@ -1,0 +1,45 @@
+<!-- view_problem.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">{{ problem.name }}</h2>
+            <p class="card-text">{{ problem.description }}</p>
+
+            <a href="{% url 'view_submissions' %}?problem_id={{ problem.id }}" class="btn btn-primary">View Submissions</a>
+
+            <!-- Button trigger modal -->
+            {% if problem.can_send %}
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#submitSolutionModal">
+                Submit Solution
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="submitSolutionModal" tabindex="-1" aria-labelledby="submitSolutionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="submitSolutionModalLabel">Submit Solution</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{% url 'submit_solution' problem.id %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="codeFile" class="form-label">Upload Code File</label>
+                            <input type="file" class="form-control" id="codeFile" name="code_file">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

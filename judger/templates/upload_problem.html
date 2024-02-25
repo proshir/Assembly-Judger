@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Problem{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Upload Problem</h2>
+    <div class="card">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    {{ form }}
+                </div>
+                <button type="submit" class="btn btn-primary">Upload Problem</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
