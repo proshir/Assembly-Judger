@@ -1,6 +1,8 @@
 import os
+import re
 import shutil
 import subprocess
+import tempfile
 
 def submission_file_path(instance, filename):
     return f"submissions/{instance.problem.name}/{instance.user_id}/{instance.created_at:%Y-%m-%d_%H-%M-%S}.asm"
@@ -20,37 +22,61 @@ def delete_file(file_path):
     if os.path.exists(file_path):
         os.remove(file_path)
 
-def test_code(code_file, problem):
-    temp_dir = f"temp"
-    if os.path.exists(temp_dir):
-        shutil.rmtree(temp_dir)
-    os.makedirs(temp_dir)
-    code_file = os.path.join('media', code_file.path)
-    subprocess.run(f'nasm -f elf64 "{code_file}" -o "{temp_dir}/code.o"', shell=True, check=True)
-    subprocess.run(f"ld {temp_dir}/code.o -e _start -o {temp_dir}/a.out", shell=True, check=True)
-    test_cases_path = f"media/problems/{problem.name}"
-    results = []
-    for input_file_name in os.listdir(f"{test_cases_path}/input"):
-        try:
-            input_file_path = os.path.join(test_cases_path, "input", input_file_name)
-            output_file_path = os.path.join(test_cases_path, "output", f"output{input_file_name.split('input')[1]}")
-            with open(input_file_path, 'r') as input_file, open(f"{temp_dir}/output.txt", 'w') as output_file:
-                try:
-                    subprocess.run([f"{temp_dir}/a.out"], stdin=input_file, stdout=output_file, timeout=problem.timeout)
-                except subprocess.TimeoutExpired:
-                    results += [2]
-                    continue
-                
-            with open(output_file_path, 'r') as expected_file, open(f"{temp_dir}/output.txt", 'r') as actual_file:
-                expected_output = expected_file.read()
-                actual_output = actual_file.read()
-                if expected_output == actual_output:
-                    results += [0]
-                else:
-                    results += [1]
-        except Exception as e:
-            results += [3]
+import logging
 
+def sort_key(filename):
+    match = re.search(r'(\d+)', filename)
+    if match:
+        return int(match.group(1))
+    else:
+        return float('inf') 
+
+
+def test_code(code_file, problem):
+    temp_dir = tempfile.mkdtemp(prefix="temp_", dir="temp")
+    try:
+        code_file_path = os.path.join('media', code_file.path)
+        o_path = os.path.join(temp_dir, "code.o")
+        subprocess.run(f'nasm -f elf64 "{code_file_path}" -o "{o_path}"', shell=True, check=True)
+        a_path = os.path.join(temp_dir, 'a.out')
+        subprocess.run(f"ld {o_path} -e _start -o {a_path}", shell=True, check=True)
+        
+        test_cases_path = f"media/problems/{problem.name}"
+        results = []
+
+        for input_file_name in sorted(os.listdir(os.path.join(test_cases_path, 'input')), key=sort_key):
+            try:
+                input_file_path = os.path.join(test_cases_path, "input", input_file_name)
+                output_file_path = os.path.join(test_cases_path, "output", f"output{input_file_name.split('input')[1]}")
+                output_act = os.path.join(temp_dir, 'output.txt')
+
+                completed_process = subprocess.run(a_path, input=open(input_file_path, 'r').read(), 
+                                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, 
+                                                timeout=problem.timeout, text=True)
+                
+                if completed_process.returncode == 0:
+                    with open(output_act, 'w') as output_file:
+                        output_file.write(completed_process.stdout)
+                else:
+                    raise Exception("Error occurred:", completed_process.stderr)
+
+                with open(output_file_path, 'r') as expected_file, open(output_act, 'r') as your_out_file:
+                    expected_output = expected_file.read()
+                    your_output = your_out_file.read()
+                    if expected_output == your_output:
+                        results += [0]
+                    else:
+                        results += [1]
+
+            except subprocess.TimeoutExpired:
+                print("Subprocess timed out.")
+                results += [2] 
+            
+            except Exception as e:
+                logging.error("Error at testing code: %s", str(e))
+                results += [3]
+    finally:
+        shutil.rmtree(temp_dir)
     return results
 
 def read_code_file(code_file):

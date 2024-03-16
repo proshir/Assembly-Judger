@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
+from django.db.models import Max, Subquery, OuterRef
 
 from judger.utils import delete_file, delete_folder, extract_zip, problem_test_folder_path, problem_test_file_path, submission_file_path
     
@@ -9,7 +10,7 @@ class Problem(models.Model):
     description = models.TextField()
     test_file = models.FileField(upload_to=problem_test_file_path)
     can_send = models.BooleanField(default=True)
-    timeout = models.IntegerField(default=60)  # Timeout in seconds
+    timeout = models.IntegerField(default=1)  # Timeout in seconds
 
     def save(self, *args, **kwargs):
         if self.pk is None:
@@ -25,6 +26,9 @@ class Problem(models.Model):
         folder_path = problem_test_folder_path(self)
         delete_folder(folder_path)
         super().delete(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
 
 class Submission(models.Model):
     STATUS_CHOICES = (
@@ -55,7 +59,24 @@ class Submission(models.Model):
         }
         
         return list(zip(range(1, len(self.result) + 1), [result_descriptions.get(result, "Unknown") for result in self.result])) if self.result else []
+    
+    @staticmethod
+    def get_final_submissions(queryset):
+        max_scores = Submission.objects.filter(
+            user=OuterRef('user'),
+            problem=OuterRef('problem')
+        ).values('user', 'problem').annotate(
+            max_score=Max('score'),
+            oldest_created_at=Max('created_at')
+        )
 
+        return queryset.filter(
+            user_id__in=Subquery(max_scores.values('user')),
+            problem_id__in=Subquery(max_scores.values('problem')),
+            score__in=Subquery(max_scores.values('max_score')),
+            created_at=Subquery(max_scores.values('oldest_created_at'))  # Filter by earliest created_at
+        )
+    
     def delete(self, *args, **kwargs):
         delete_file(self.code_file.path)
         super().delete(*args, **kwargs)

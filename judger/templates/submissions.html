@@ -9,7 +9,10 @@
 
     <div class="card">
         <div class="card-body">
-        <a href="?download_csv=true" class="btn btn-primary mb-3">Download CSV</a>
+        <div class="d-flex justify-content-between">
+            <a id="download-csv-link" href="#" class="btn btn-primary mb-3">Download CSV</a>
+<button id="finalSubmissionsBtn" class="btn btn-primary mb-3" onclick="toggleFinalSubmissions()">Final Submissions</button>
+        </div>
         <table id="submissionTable" class="table">
         <thead>
             <tr>
@@ -37,6 +40,61 @@
     </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Get the "Download CSV" link element
+        var downloadCsvLink = document.getElementById("download-csv-link");
 
+        // Add a click event listener to the link
+        downloadCsvLink.addEventListener("click", function(event) {
+            // Prevent the default action of the link
+            event.preventDefault();
+
+            // Get the current URL and append the necessary query parameters
+            var currentUrl = window.location.href;
+            var downloadUrl = currentUrl + "&download_csv=true";
+
+            // Redirect to the download URL
+            window.location.href = downloadUrl;
+        });
+    });
+    // Function to toggle final submissions filter and reload the page
+    function toggleFinalSubmissions() {
+        var url = new URL(window.location.href);
+        var isFinalSubmissionsActive = url.searchParams.get('final_submissions') === 'true';
+        if (isFinalSubmissionsActive) {
+            url.searchParams.delete('final_submissions');
+        } else {
+            url.searchParams.set('final_submissions', 'true');
+        }
+        window.location.href = url.toString(); // Reloads the page with the new URL
+    }
+
+    // Function to update button appearance based on URL parameter
+    function updateButtonAppearance() {
+        var url = new URL(window.location.href);
+        var isFinalSubmissionsActive = url.searchParams.get('final_submissions') === 'true';
+        var btn = document.getElementById("finalSubmissionsBtn");
+        if (isFinalSubmissionsActive) {
+            btn.classList.remove("btn-primary");
+            btn.classList.add("btn-success");
+            btn.textContent = "Final Submissions (Active)";
+        } else {
+            btn.classList.remove("btn-success");
+            btn.classList.add("btn-primary");
+            btn.textContent = "Final Submissions";
+        }
+    }
+
+    // Add event listener to the button
+    document.getElementById("finalSubmissionsBtn").addEventListener("click", function() {
+        toggleFinalSubmissions();
+    });
+
+    // Update button appearance when the page is loaded
+    document.addEventListener("DOMContentLoaded", function() {
+        updateButtonAppearance();
+    });
+</script>
 
 {% endblock %}
