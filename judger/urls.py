@@ -11,4 +11,6 @@ urlpatterns = [
     path('problems/<int:problem_id>/submit/', views.submit_solution, name='submit_solution'),
     path('submission/<int:submission_id>/', views.submission_detail, name='submission_detail'),
     path('submissions/', views.view_submissions, name='view_submissions'),
+    path('edit_problem/<int:problem_id>/', views.edit_problem, name='edit_problem'),
+    path('retest/<int:problem_id>/', views.retest_problem, name='retest_problem'),
 ]

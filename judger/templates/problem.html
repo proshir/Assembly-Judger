@@ -17,6 +17,12 @@
                 Submit Solution
             </button>
             {% endif %}
+
+            {% if user.is_staff %}
+            <a href="{% url 'edit_problem' problem.id %}" class="btn btn-warning">Edit Problem</a>
+            <a href="{% url 'retest_problem' problem.id %}" class="btn btn-info">Retest All Submissions</a>
+            <a href="{% url 'retest_problem' problem.id %}?final_submissions=true" class="btn btn-secondary">Retest All Final Submissions</a>
+            {% endif %}
         </div>
     </div>
 

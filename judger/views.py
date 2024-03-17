@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
-from judger.forms import ProblemForm
+from judger.forms import EditProblemForm, ProblemForm
 from judger.models import Problem, Submission
 from judger.tasks import test_code_async
 from judger.utils import read_code_file
@@ -39,16 +39,36 @@ def upload_problem(request):
     if request.method == 'POST':
         form = ProblemForm(request.POST, request.FILES)
         if form.is_valid():
-
-            uploaded_file = request.FILES['test_file']
-            if not uploaded_file.name.endswith('.zip'):
-                return HttpResponseBadRequest('Only zip files are allowed.')
-
             form.save()
             return redirect('problem_list')
     else:
         form = ProblemForm()
     return render(request, 'upload_problem.html', {'form': form})
+
+@staff_member_required
+def edit_problem(request, problem_id):
+    problem = get_object_or_404(Problem, id=problem_id)
+    if request.method == 'POST':
+        form = EditProblemForm(request.POST, request.FILES, instance=problem)
+        if form.is_valid():
+            form.save()
+            return redirect('view_problem', problem_id=problem_id)
+    else:
+        form = EditProblemForm(instance=problem)
+    return render(request, 'edit_problem.html', {'form': form})
+
+@staff_member_required
+def retest_problem(request, problem_id):
+    submissions = Submission.objects.filter(problem_id=problem_id)
+
+    final_sub = request.GET.get('final_submissions')
+    if final_sub:
+        submissions = Submission.get_final_submissions(submissions)
+
+    for submission in submissions:
+        test_code_async.delay(submission.id)
+
+    return redirect(f'/submissions/?problem_id={problem_id}')
 
 @login_required
 def problem_list(request):

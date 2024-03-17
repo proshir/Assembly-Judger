@@ -1,9 +1,10 @@
+from copy import deepcopy
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 from django.db.models import Max, Subquery, OuterRef
 
-from judger.utils import delete_file, delete_folder, extract_zip, problem_test_folder_path, problem_test_file_path, submission_file_path
+from judger.utils import delete_file, delete_folder, delete_tests, extract_zip, problem_test_folder_path, problem_test_file_path, submission_file_path
     
 class Problem(models.Model):
     name = models.CharField(max_length=30, unique=True)
@@ -11,7 +12,8 @@ class Problem(models.Model):
     test_file = models.FileField(upload_to=problem_test_file_path)
     can_send = models.BooleanField(default=True)
     timeout = models.IntegerField(default=1)  # Timeout in seconds
-
+    new_test_file_uploaded = False
+    
     def save(self, *args, **kwargs):
         if self.pk is None:
             super().save(*args, **kwargs)
@@ -21,6 +23,12 @@ class Problem(models.Model):
             delete_file(input_zip)
         else:
             super().save(*args, **kwargs)
+            if self.new_test_file_uploaded:
+                folder_path = problem_test_folder_path(self)
+                delete_tests(folder_path)
+                input_zip = self.test_file.path
+                extract_zip(input_zip, folder_path)
+                delete_file(input_zip)
 
     def delete(self, *args, **kwargs):
         folder_path = problem_test_folder_path(self)

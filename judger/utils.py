@@ -10,6 +10,12 @@ def submission_file_path(instance, filename):
 def problem_test_folder_path(instance):
     return os.path.dirname(instance.test_file.path)
 
+def get_problem_folder(name):
+    return f"media/problems/{name}"
+
+def get_submissions_folder(name):
+    return f"media/submissions/{name}"
+
 def problem_test_file_path(instance, filename):
     return f"problems/{instance.name}/{filename}"
 
@@ -88,3 +94,13 @@ def read_code_file(code_file):
 
 def delete_folder(folder_path):
     shutil.rmtree(folder_path)
+
+def delete_tests(folder_path):
+    input_folder_path = os.path.join(folder_path, 'input')
+    output_folder_path = os.path.join(folder_path, 'output')
+
+    if os.path.exists(input_folder_path):
+        shutil.rmtree(input_folder_path)
+    
+    if os.path.exists(output_folder_path):
+        shutil.rmtree(output_folder_path)

@@ -3,27 +3,11 @@
 
 {% block content %}
 <div class="container">
-    <h2>Upload Problem</h2>
+    <h2>Edit Problem {{ form.instance.name }}</h2>
     <div class="card">
         <div class="card-body">
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-                {% if form.errors %}
-                <div class="alert alert-danger" role="alert">
-                    <strong>Error:</strong> Please correct the following errors:
-                    <ul>
-                        {% for field, error_list in form.errors.items %}
-                            {% for error in error_list %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        {% endfor %}
-                    </ul>
-                </div>
-                {% endif %}
-                <div class="mb-3">
-                    <label for="problemName" class="form-label">Problem Name</label>
-                    <input type="text" class="form-control" id="problemName" name="name" value="{{ form.instance.name }}">
-                </div>
                 <div class="mb-3">
                     <label for="problemDescription" class="form-label">Description</label>
                     <textarea class="form-control" id="problemDescription" name="description" rows="4">{{ form.instance.description }}</textarea>
