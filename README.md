@@ -109,7 +109,7 @@ Users are provided with comprehensive feedback on their submissions within the p
 
 ## Submission Overview and Reporting:
 
-Users have the flexibility to access their submissions for specific problems or view all of their submissions across the platform. Additionally, users can generate comprehensive reports in CSV format, providing a detailed overview of their submissions, scores, and performance metrics. On the other hand, staff members possess broader access privileges, allowing them to view the results of all students collectively or filter by specific users, problems, or criteria. This robust reporting functionality empowers both users and staff to track progress, identify areas for improvement, and facilitate data-driven decision-making within the educational context.
+Users have the flexibility to access their submissions for specific problems or view all of their submissions across the platform. Additionally, users can generate comprehensive reports in CSV format, providing a detailed overview of their submissions, scores, and performance metrics. Moreover, users are empowered to click on "final submission" to see just the final submission for each user in each problem. They can then click it again to revert to the previous state and view all submissions. On the other hand, staff members possess broader access privileges, allowing them to view the results of all students collectively or filter by specific users, problems, or criteria. This robust reporting functionality empowers both users and staff to track progress, identify areas for improvement, and facilitate data-driven decision-making within the educational context.
 
 <div align="center">
     <img src="images/submis.jpg" alt="Submis Page">
