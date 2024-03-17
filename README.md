@@ -85,9 +85,17 @@ Feel free to adjust the instructions as needed based on your project's specific 
 
 ---
 
-## Upload Problems
+## Upload Problem
 
 Staff members have the capability to upload programming problems to the platform. This includes setting the title and description of the problem, defining a time limit for submissions in seconds, and providing input-output test cases packaged in a zip file, similar to the format used on platforms like Codeforces. Additionally, staff members can choose whether users are allowed to submit solutions to the problem or not. This functionality empowers staff to efficiently manage and administer the problem-solving environment, ensuring a structured and controlled learning experience for students.
+
+
+<div align="center">
+    <img src="images/uproblem.jpg" alt="Upload Problem Page">
+</div>
+
+## Problems List
+
 Users can view a list of problems and check whether they can submit solutions for each problem.
 
 <div align="center">
@@ -100,6 +108,13 @@ Within the platform, users have the capability to not only view their submission
 
 <div align="center">
     <img src="images/upload.jpg" alt="Upload Page">
+</div>
+
+## Editing Problems and Retesting Submissions
+As an administrator, you wield the authority to amend problem details as necessary. After these modifications, you have the option to retest submissions, whether opting for a comprehensive retest of all submissions or solely focusing on final ones.
+
+<div align="center">
+    <img src="images/eproblem.jpg" alt="Edit Problem">
 </div>
 
 ## View Submission Results
